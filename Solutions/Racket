@@ -1,0 +1,95 @@
+#lang racket
+
+; factorial recursive implementation
+(define (factorial n)
+  (if (= n 0)
+      1
+      (* n (factorial (- n 1)))))
+
+; classic head-tail recursion
+(define (sumlist lis)
+  (if (= (length lis) 0)
+      0
+      (+ (car lis) (sumlist (cdr lis)))))
+
+(define (mean lis)
+  (/ (sumlist lis) (length lis)))
+
+(define (median lis)
+  (if (= (remainder (length lis) 2) 1)
+      (list-ref lis (quotient (length lis) 2))
+      ; else branch
+      (/(+ (list-ref lis (-(quotient (length lis) 2)1))
+         (list-ref lis (quotient (length lis) 2))) 2)))
+
+(define (medianRec lis)
+  (sort lis <)
+  (cond
+    [(= (length lis) 1) (car lis)] ; Base case: return the first element for length 1
+    [(= (length lis) 2) (/ (sumlist lis) 2.0)] ; Base case: return the mean for length 2
+    (else
+     (medianRec (cdr (reverse (cdr lis)))))))
+
+(define (findMax lis)
+  (if (= (length lis) 1)
+      (car lis)
+      (if (> (car lis) (findMax (cdr lis)))
+          (car lis)
+          (findMax (cdr lis)))))
+
+
+(define (findMaxC lis)
+  (cond
+    [(=  (length lis) 1) (car lis)]
+    [(> (car lis) (findMaxC (cdr lis))) (car lis)]
+    [else (findMaxC (cdr lis))]))
+
+(define (med lis)
+  (let
+      [(sortedlis (sort lis <))]
+    (if (even? (length lis)) (middle2 lis) (middle1 lis))))
+
+(define (middle2 lis)
+  (let
+      [
+       (leftmid (memberAt (-(floor (/ (length lis) 2))1) lis))
+       (rightmid (memberAt (floor (/ (length lis) 2)) lis))
+       ]
+    (mean (list leftmid rightmid))
+  ))
+
+(define (middle1 lis)
+  (memberAt (floor (/ (length lis) 2)) lis)
+  )
+
+(define (memberAt i lis)
+  (if (= i 0)
+      (car lis)
+      (memberAt (- i 1) (cdr lis))))
+
+
+(define(countElement atm lis)
+ (cond
+   [(empty? lis) 0]
+   [(equal? atm (car lis)) (+ 1 (countElement atm (cdr lis)))]
+   [else (countElement atm (cdr lis))]))
+
+
+(define (countEach lis1 lis2)
+ (if (= (length lis1) 1)
+     (list (cons (car lis1) (countElement (car lis1) lis2)))
+     (append (list (cons (car lis1) (countElement (car lis1) lis2))) (countEach (cdr lis1) lis2))))
+
+
+(define (pairorder a b)
+  (> (cdr a) (cdr b)))
+
+(define (isGreater)
+  0)
+
+(define (mode lis)
+  (let
+      [
+       (counts (countEach (remove-duplicates lis) lis))
+       ]
+       (car (car (sort counts pairorder)))))
